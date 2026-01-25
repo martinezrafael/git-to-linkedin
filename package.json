@@ -1,0 +1,36 @@
+{
+  "name": "git-to-linkedin",
+  "version": "0.1.0",
+  "description": "Gere posts técnicos automaticamente a partir de git diff e publique no LinkedIn",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "git-to-linkedin": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "linkedin",
+    "automation",
+    "git",
+    "ai",
+    "llm",
+    "developer-tools"
+  ],
+  "author": "Rafael Molina Martinez",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "dotenv": "^16.4.0",
+    "form-data": "^4.0.0",
+    "openai": "^4.0.0"
+  }
+}
