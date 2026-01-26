@@ -2,26 +2,28 @@ import OpenAI from "openai";
 import buildSystemPrompt from "./buildSystemPrompt.js";
 import buildUserPrompt from "./buildUserPrompt.js";
 
-const groq = new OpenAI({
-  apiKey: process.env.TEXT_API_KEY,
-  baseURL: "https://api.groq.com/openai/v1",
-});
+const DEFAULT_BASE_URL = "https://api.groq.com/openai/v1";
 
 /**
- * Gera o texto do post utilizando a API da Groq/OpenAI
- * @param {string} diff - O diff do git
- * @param {object} promptConfig - O objeto de configuração carregado do JSON
+ * @param {string} diff
+ * @param {object} promptConfig
+ * @param {string} apiKey
  */
-async function generatePostFromDiff(diff, promptConfig) {
-  // Verificação de segurança caso o config venha vazio
+async function generatePostFromDiff(diff, promptConfig, apiKey) {
   if (!promptConfig) {
-    throw new Error(
-      "A configuração 'promptConfig' não foi fornecida para generatePostFromDiff.",
-    );
+    throw new Error("Prompt configuration was not provided.");
+  }
+  if (!apiKey) {
+    throw new Error("API key was not provided.");
   }
 
-  const completion = await groq.chat.completions.create({
-    model: promptConfig.model || "llama-3.3-70b-versatile", // Fallback caso o modelo não esteja no JSON
+  const client = new OpenAI({
+    apiKey: apiKey,
+    baseURL: promptConfig.baseURL || DEFAULT_BASE_URL,
+  });
+
+  const completion = await client.chat.completions.create({
+    model: promptConfig.model || "llama-3.3-70b-versatile",
     temperature: promptConfig.temperature ?? 0.7,
     max_tokens: promptConfig.maxTokens || 1024,
     messages: [

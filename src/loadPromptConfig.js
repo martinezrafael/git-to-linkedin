@@ -4,9 +4,11 @@ function loadPromptConfig(configPath) {
   try {
     return JSON.parse(fs.readFileSync(configPath, "utf-8"));
   } catch (err) {
-    console.error("❌ Erro ao carregar prompt.config.json");
+    console.error("Erro ao carregar prompt.config.json");
     console.error(err.message);
-    process.exit(1);
+    throw new Error(
+      `Failed to load prompt configuration from ${configPath}: ${err.message}`,
+    );
   }
 }
 

@@ -1,5 +1,9 @@
 import readline from "readline";
 
+/**
+ * @param {string} question
+ */
+
 function askConfirmation(question) {
   const rl = readline.createInterface({
     input: process.stdin,

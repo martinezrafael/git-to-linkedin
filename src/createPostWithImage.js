@@ -1,30 +1,46 @@
 import axios from "axios";
 import retry from "./retry.js";
 
-const axiosInstance = axios.create({
-  timeout: 20000,
-  headers: {
-    Authorization: `Bearer ${process.env.LINKEDIN_ACCESS_TOKEN}`,
-    "X-Restli-Protocol-Version": "2.0.0",
-  },
-});
-
-async function createPostWithImage(personUrn, text, assetUrn, linkedinApiUrl) {
+/**
+ * @param {string} accessToken
+ * @param {string} personUrn
+ * @param {string} text
+ * @param {string} assetUrn
+ * @param {string} linkedinApiUrl
+ * @returns {Promise<any>}
+ */
+async function createPostWithImage(
+  accessToken,
+  personUrn,
+  text,
+  assetUrn,
+  linkedinApiUrl,
+) {
   return retry(() =>
-    axiosInstance.post(`${linkedinApiUrl}/ugcPosts`, {
-      author: personUrn,
-      lifecycleState: "PUBLISHED",
-      specificContent: {
-        "com.linkedin.ugc.ShareContent": {
-          shareCommentary: { text },
-          shareMediaCategory: "IMAGE",
-          media: [{ status: "READY", media: assetUrn }],
+    axios.post(
+      `${linkedinApiUrl}/ugcPosts`,
+      {
+        author: personUrn,
+        lifecycleState: "PUBLISHED",
+        specificContent: {
+          "com.linkedin.ugc.ShareContent": {
+            shareCommentary: { text },
+            shareMediaCategory: "IMAGE",
+            media: [{ status: "READY", media: assetUrn }],
+          },
+        },
+        visibility: {
+          "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
         },
       },
-      visibility: {
-        "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC",
+      {
+        timeout: 20000,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "X-Restli-Protocol-Version": "2.0.0",
+        },
       },
-    }),
+    ),
   );
 }
 
