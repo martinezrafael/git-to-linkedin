@@ -1,3 +1,6 @@
+import fs from "fs";
+import path from "path";
+
 function getLatestImageFromFolder(folderPath) {
   if (!fs.existsSync(folderPath)) {
     throw new Error(`Pasta de imagens não encontrada: ${folderPath}`);
