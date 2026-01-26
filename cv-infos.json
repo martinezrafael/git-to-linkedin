@@ -1,0 +1,23 @@
+{
+  "nome": "Rafael Molina Martinez",
+  "titulo": "Desenvolvedor Full Stack | Node.js | TypeScript | NestJS | React | APIs REST | PostgreSQL | MongoDB | Docker",
+  "sobre": "Desenvolvedor Fullstack com experiência no desenvolvimento de aplicações web de ponta a ponta, atuando tanto no backend quanto no frontend. Forte atuação em APIs e microsserviços com Node.js e TypeScript, além de experiência prática com React.js no frontend. Vivência com bancos de dados relacionais, mensageria, containers, CI/CD e cloud, entregando soluções escaláveis, seguras e alinhadas às necessidades do negócio.",
+  "experiencias": [
+    {
+      "titulo": "Programador Backend",
+      "empresa": "Conquest One",
+      "descricao": "Alocado na Fintech Trademaster. Focado no desenvolvimento e evolução de microsserviços escaláveis e de alta performance. \n Atuando na construção de soluções backend utilizando Node.js com NestJS, aplicando boas práticas de arquitetura e código limpo. \n Experiência em modelagem e persistência de dados com PostgreSQL, utilizando TypeORM e Prisma como ORMs. \n Trabalho com mensageria assíncrona via RabbitMQ, garantindo desacoplamento entre serviços e maior resiliência das aplicações \n .Atuação em ambientes conteinerizados com Docker e Docker Compose, facilitando padronização, deploy e escalabilidade. \n Implementação de testes automatizados com Jest, assegurando qualidade e confiabilidade do código."
+    }
+  ],
+  "stack": [
+    "Node.js",
+    "TypeScript",
+    "NestJS",
+    "PostgreSQL",
+    "TypeORM",
+    "RabbitMQ",
+    "Docker",
+    "Docker Compose",
+    "Jest"
+  ]
+}
