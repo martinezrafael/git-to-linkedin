@@ -3,6 +3,7 @@
 import path from "path";
 import { execSync } from "child_process";
 import "dotenv/config";
+import chalk from "chalk"; // Importando o Chalk
 import loadPromptConfig from "./utils/loadPromptConfig.js";
 import askConfirmation from "./utils/askConfirmation.js";
 import getLatestImageFromFolder from "./utils/getLatestImageFromFolder.js";
@@ -10,25 +11,23 @@ import { generateText, publishPost } from "./index.js";
 
 const ROOT_DIR = process.cwd();
 const IMAGES_DIR = path.join(ROOT_DIR, "src", "images");
-// Ajustado para src/config conforme a estrutura que você confirmou anteriormente
 const PROMPT_CONFIG_PATH = path.join(ROOT_DIR, "config", "prompt.config.json");
 
 async function run() {
   try {
-    console.log("🔍 Analisando commits para o push...");
+    console.log(chalk.blue.bold("\n🔍 Analisando commits para o push..."));
 
-    // Tenta pegar o diff entre a branch atual e a remota
-    // Se for o primeiro push da branch, ele pega o diff do último commit
     let diff = "";
     try {
       diff = execSync("git diff @{u}..HEAD").toString();
     } catch (e) {
-      // Fallback: Pega as mudanças do último commit se não houver upstream
       diff = execSync("git diff HEAD~1..HEAD").toString();
     }
 
     if (!diff.trim()) {
-      console.log("⚠️ Nenhuma alteração detectada para gerar o post.");
+      console.log(
+        chalk.yellow("⚠️  Nenhuma alteração detectada para gerar o post."),
+      );
       return;
     }
 
@@ -40,44 +39,55 @@ async function run() {
       imagesDir: IMAGES_DIR,
     };
 
-    console.log("🤖 Gerando post com IA...");
+    console.log(chalk.magenta("🤖 Gerando post com IA..."));
     const postText = await generateText(diff, config);
 
-    console.log("\n--- 📝 PRÉ-VISUALIZAÇÃO DO POST ---");
-    console.log(postText);
-    console.log("-----------------------------------\n");
+    console.log(chalk.cyan.bold("\n--- 📝 PRÉ-VISUALIZAÇÃO DO POST ---"));
+    console.log(chalk.white(postText));
+    console.log(chalk.cyan.bold("-----------------------------------\n"));
 
     try {
       const latestImagePath = getLatestImageFromFolder(IMAGES_DIR);
-      console.log(`📸 Imagem encontrada: ${path.basename(latestImagePath)}`);
+      console.log(
+        chalk.green(
+          `📸 Imagem encontrada: ${chalk.underline(path.basename(latestImagePath))}`,
+        ),
+      );
     } catch (imageError) {
-      console.warn(`⚠️ Aviso: Nenhuma imagem encontrada em ${IMAGES_DIR}`);
+      console.warn(
+        chalk.yellow(`⚠️  Aviso: Nenhuma imagem encontrada em ${IMAGES_DIR}`),
+      );
     }
 
     if (config.dryRun) {
-      console.log("🚫 Dry-run ativo. O post não será publicado.");
+      console.log(
+        chalk.bgWhite.black(" 🚫 Dry-run ativo. O post não será publicado. "),
+      );
       return;
     }
 
-    // Se estiver no pre-push, precisamos garantir que o prompt aceite input
     if (config.requireConfirmation && !config.autoPublish) {
-      const answer = await askConfirmation(
+      const question = chalk.yellowBright.bold(
         "\n🚀 Deseja publicar este resumo no LinkedIn agora? (s/n): ",
       );
+      const answer = await askConfirmation(question);
 
       if (!["s", "yes", "y"].includes(answer.toLowerCase().trim())) {
-        console.log("✅ Push continuará, mas a publicação foi cancelada.");
+        console.log(
+          chalk.gray("✅ Push continuará, mas a publicação foi cancelada."),
+        );
         return;
       }
     }
 
-    console.log("📤 Publicando no LinkedIn...");
+    console.log(chalk.blueBright("📤 Publicando no LinkedIn..."));
     await publishPost(postText, config);
-    console.log("🎉 Post publicado com sucesso!");
+    console.log(chalk.green.bold("\n🎉 Post publicado com sucesso!\n"));
   } catch (err) {
-    console.error("❌ Erro no processo:", err.message);
-    // No hook, sair com 1 cancela o push.
-    // Se quiser que o push ocorra mesmo com erro no post, mude para process.exit(0)
+    console.error(
+      chalk.red.bold("\n❌ Erro no processo:"),
+      chalk.red(err.message),
+    );
     process.exit(1);
   }
 }

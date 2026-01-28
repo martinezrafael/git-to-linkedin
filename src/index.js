@@ -7,11 +7,6 @@ import createTextOnlyPost from "./linkedin/createTextOnlyPost.js";
 
 const DEFAULT_LINKEDIN_API = "https://api.linkedin.com/v2";
 
-/**
- * @param {string} diff
- * @param {object} config
- * @returns {Promise<string>}
- */
 export async function generateText(diff, config) {
   if (!diff.trim()) {
     throw new Error("Diff is empty. Nothing to generate text from.");
@@ -23,14 +18,6 @@ export async function generateText(diff, config) {
   return generatePostFromDiff(diff, config, config.openAIApiKey);
 }
 
-/**
- * @param {string} postText
- * @param {object} config
- * @param {string} config.linkedinToken
- * @param {string} [config.linkedinApiUrl]
- * @param {string} [config.imagesDir]
- * @returns {Promise<void>}
- */
 export async function publishPost(postText, config) {
   if (!postText.trim()) {
     throw new Error("Post text is empty. Nothing to publish.");
@@ -44,28 +31,36 @@ export async function publishPost(postText, config) {
     ? getLatestImageFromFolder(config.imagesDir)
     : null;
 
-  const personUrn = await getPersonUrn(config.linkedinToken, linkedinApiUrl);
+  try {
+    const personUrn = await getPersonUrn(config.linkedinToken, linkedinApiUrl);
 
-  if (imagePath) {
-    try {
-      const assetUrn = await uploadImage(
-        config.linkedinToken,
-        personUrn,
-        imagePath,
-        linkedinApiUrl,
-      );
-      await createPostWithImage(
-        config.linkedinToken,
-        personUrn,
-        postText,
-        assetUrn,
-        linkedinApiUrl,
-      );
-    } catch (err) {
-      console.warn(
-        "Failed to publish with image, falling back to text-only.",
-        err,
-      );
+    if (imagePath) {
+      try {
+        console.log(`DEBUG: Iniciando upload da imagem: ${imagePath}`);
+        const assetUrn = await uploadImage(
+          config.linkedinToken,
+          personUrn,
+          imagePath,
+          linkedinApiUrl,
+        );
+
+        await createPostWithImage(
+          config.linkedinToken,
+          personUrn,
+          postText,
+          assetUrn,
+          linkedinApiUrl,
+        );
+      } catch (err) {
+        console.warn("Falha ao publicar com imagem, tentando apenas texto...");
+        await createTextOnlyPost(
+          config.linkedinToken,
+          personUrn,
+          postText,
+          linkedinApiUrl,
+        );
+      }
+    } else {
       await createTextOnlyPost(
         config.linkedinToken,
         personUrn,
@@ -73,12 +68,14 @@ export async function publishPost(postText, config) {
         linkedinApiUrl,
       );
     }
-  } else {
-    await createTextOnlyPost(
-      config.linkedinToken,
-      personUrn,
-      postText,
-      linkedinApiUrl,
-    );
+  } catch (err) {
+    console.error("ERRO CRÍTICO NA PUBLICAÇÃO:", {
+      message: err.message,
+      status: err.response?.status,
+      statusText: err.response?.statusText,
+      apiData: err.response?.data,
+      code: err.code,
+    });
+    throw err;
   }
 }
