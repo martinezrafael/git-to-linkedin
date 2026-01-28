@@ -1,2 +1,5 @@
 node_modules
 .env
+images-to-linkedin-post/
+.husky/
+git-to-linkedin.config.json
