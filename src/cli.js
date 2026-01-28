@@ -3,7 +3,7 @@
 import path from "path";
 import { execSync } from "child_process";
 import "dotenv/config";
-import chalk from "chalk"; // Importando o Chalk
+import chalk from "chalk";
 import loadPromptConfig from "./utils/loadPromptConfig.js";
 import askConfirmation from "./utils/askConfirmation.js";
 import getLatestImageFromFolder from "./utils/getLatestImageFromFolder.js";
