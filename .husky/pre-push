@@ -1,5 +1,4 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
-exec < /dev/tty && npm run linkedin-post
-
+#!/bin/env sh
+# Vincula o terminal ao script para suportar menus interativos durante o push
+exec < /dev/tty
+npx git-to-linkedin

@@ -50,12 +50,12 @@ async function run() {
     const config = {
       ...fileConfig,
       linkedinToken: process.env.LINKEDIN_ACCESS_TOKEN,
-      openAIApiKey: process.env.TEXT_API_KEY,
+      openAIApiKey: process.env.IA_API_KEY,
       imagesDir: IMAGES_DIR,
     };
 
     if (!config.openAIApiKey) {
-      throw new Error("TEXT_API_KEY não encontrada no .env");
+      throw new Error("IA_API_KEY não encontrada no .env");
     }
 
     console.log(chalk.magenta("🤖 Gerando post com IA..."));

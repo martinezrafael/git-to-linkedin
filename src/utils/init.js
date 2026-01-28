@@ -128,7 +128,12 @@ export function setupProject() {
     ),
   );
   console.log(chalk.yellow(`    LINKEDIN_ACCESS_TOKEN=teu_token_aqui`));
-  console.log(chalk.yellow(`    TEXT_API_KEY=tua_chave_da_ia_aqui`));
+  console.log(chalk.yellow(`    LINKEDIN_CLIENT_ID=teu_client_id_aqui`));
+  console.log(
+    chalk.yellow(`    LINKEDIN_CLIENT_SECRET=teu_client_secret_aqui`),
+  );
+  console.log(chalk.yellow(`    LINKEDIN_MEMBER_URN=teu_member_urn_aqui`));
+  console.log(chalk.yellow(`    IA_API_KEY=tua_chave_da_ia_aqui`));
   console.log("");
   console.log(chalk.white(` 2. Identidade Visual:`));
   console.log(
