@@ -7,11 +7,23 @@ import chalk from "chalk";
 import loadPromptConfig from "./utils/loadPromptConfig.js";
 import askConfirmation from "./utils/askConfirmation.js";
 import getLatestImageFromFolder from "./utils/getLatestImageFromFolder.js";
+import { setupProject } from "./utils/init.js";
 import { generateText, publishPost } from "./index.js";
 
 const ROOT_DIR = process.cwd();
-const IMAGES_DIR = path.join(ROOT_DIR, "src", "images");
-const PROMPT_CONFIG_PATH = path.join(ROOT_DIR, "config", "prompt.config.json");
+const args = process.argv.slice(2);
+
+/**
+ * Ponto de entrada para inicialização da lib
+ */
+if (args.includes("--init")) {
+  setupProject();
+  process.exit(0);
+}
+
+// Configurações baseadas no diretório onde o comando é executado
+const IMAGES_DIR = path.join(process.cwd(), "images-to-linkedin-post");
+const PROMPT_CONFIG_PATH = path.join(ROOT_DIR, "git-to-linkedin.config.json");
 
 async function run() {
   try {
@@ -19,18 +31,21 @@ async function run() {
 
     let diff = "";
     try {
-      diff = execSync("git diff @{u}..HEAD").toString();
+      // Tenta pegar o diff entre a branch atual e o upstream
+      diff = execSync("git diff @{u}..HEAD", { stdio: "pipe" }).toString();
     } catch (e) {
-      diff = execSync("git diff HEAD~1..HEAD").toString();
+      // Fallback para o último commit caso não haja upstream
+      diff = execSync("git diff HEAD~1..HEAD", { stdio: "pipe" }).toString();
     }
 
     if (!diff.trim()) {
       console.log(
         chalk.yellow("⚠️  Nenhuma alteração detectada para gerar o post."),
       );
-      return;
+      process.exit(0); // Sai com sucesso para permitir o push silencioso
     }
 
+    // Carrega a config do projeto do usuário ou usa defaults
     const fileConfig = loadPromptConfig(PROMPT_CONFIG_PATH);
     const config = {
       ...fileConfig,
@@ -39,6 +54,10 @@ async function run() {
       imagesDir: IMAGES_DIR,
     };
 
+    if (!config.openAIApiKey) {
+      throw new Error("TEXT_API_KEY não encontrada no .env");
+    }
+
     console.log(chalk.magenta("🤖 Gerando post com IA..."));
     const postText = await generateText(diff, config);
 
@@ -46,6 +65,7 @@ async function run() {
     console.log(chalk.white(postText));
     console.log(chalk.cyan.bold("-----------------------------------\n"));
 
+    // Busca imagem opcionalmente
     try {
       const latestImagePath = getLatestImageFromFolder(IMAGES_DIR);
       console.log(
@@ -63,10 +83,10 @@ async function run() {
       console.log(
         chalk.bgWhite.black(" 🚫 Dry-run ativo. O post não será publicado. "),
       );
-      return;
+      process.exit(0);
     }
 
-    // --- NOVO MENU DE OPÇÕES ---
+    // Menu de Escolhas
     console.log(chalk.white.bold("O que deseja fazer?"));
     console.log(
       chalk.white(
@@ -94,7 +114,7 @@ async function run() {
         console.log(
           chalk.green.bold("🎉 Post publicado! Prosseguindo com o push...\n"),
         );
-        process.exit(0); // Sucesso para o Git: Push continua
+        process.exit(0);
         break;
 
       case "2":
@@ -104,7 +124,7 @@ async function run() {
         console.log(
           chalk.yellow("⚠️  Push cancelado conforme solicitado (Opção 2)."),
         );
-        process.exit(1); // "Erro" para o Git: Push cancelado
+        process.exit(1);
         break;
 
       case "3":
@@ -113,14 +133,14 @@ async function run() {
             "\n✅ Pulando publicação. Prosseguindo apenas com o push...",
           ),
         );
-        process.exit(0); // Sucesso para o Git: Push continua
+        process.exit(0);
         break;
 
       case "0":
         console.log(
           chalk.red("\n❌ Operação cancelada. O push não será realizado."),
         );
-        process.exit(1); // "Erro" para o Git: Push cancelado
+        process.exit(1);
         break;
 
       default:
@@ -134,6 +154,8 @@ async function run() {
       chalk.red.bold("\n❌ Erro no processo:"),
       chalk.red(err.message),
     );
+    // Importante: No caso de erro na IA ou API, você decide se trava o push ou não.
+    // Usar exit(1) garante que você não dê push em código quebrado ou sem querer.
     process.exit(1);
   }
 }

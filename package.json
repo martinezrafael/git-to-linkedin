@@ -1,14 +1,16 @@
 {
   "name": "@martinezrafael/git-to-linkedin",
-  "version": "0.1.0",
-  "description": "Gere posts técnicos automaticamente a partir de git diff e publique no LinkedIn",
+  "version": "1.0.0",
+  "description": "Gere posts técnicos automaticamente a partir de git diff e publique no LinkedIn usando IA",
   "type": "module",
   "main": "src/index.js",
   "bin": {
-    "linkedin-post": "node src/cli.js"
+    "git-to-linkedin": "src/cli.js"
   },
   "files": [
-    "src"
+    "src",
+    "README.md",
+    "LICENSE"
   ],
   "keywords": [
     "linkedin",
@@ -16,7 +18,8 @@
     "git",
     "ai",
     "llm",
-    "developer-tools"
+    "developer-tools",
+    "productivity"
   ],
   "author": "Rafael Molina Martinez",
   "license": "MIT",
@@ -24,19 +27,20 @@
     "node": ">=18"
   },
   "scripts": {
-    "linkedin-post": "node src/cli.js",
-    "build": "tsc",
-    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install"
   },
   "dependencies": {
     "axios": "^1.6.0",
-    "chalk": "^5.6.2",
+    "chalk": "^5.3.0",
     "dotenv": "^16.4.0",
     "form-data": "^4.0.0",
     "openai": "^4.0.0"
   },
   "devDependencies": {
     "husky": "^8.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
