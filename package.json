@@ -24,6 +24,7 @@
     "node": ">=18"
   },
   "scripts": {
+    "linkedin-post": "node src/cli.js",
     "build": "tsc",
     "prepublishOnly": "npm run build"
   },
