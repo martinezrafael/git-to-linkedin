@@ -66,23 +66,69 @@ async function run() {
       return;
     }
 
-    if (config.requireConfirmation && !config.autoPublish) {
-      const question = chalk.yellowBright.bold(
-        "\n🚀 Deseja publicar este resumo no LinkedIn agora? (s/n): ",
-      );
-      const answer = await askConfirmation(question);
+    // --- NOVO MENU DE OPÇÕES ---
+    console.log(chalk.white.bold("O que deseja fazer?"));
+    console.log(
+      chalk.white(
+        `1. 🚀 ${chalk.bold("Publicar")} no LinkedIn e fazer o ${chalk.bold("Push")}`,
+      ),
+    );
+    console.log(
+      chalk.white(`2. 📱 ${chalk.bold("Publicar")} apenas no LinkedIn`),
+    );
+    console.log(
+      chalk.white(`3. ⬆️  Fazer ${chalk.bold("apenas o Push")} sem publicar`),
+    );
+    console.log(
+      chalk.white(`0. ❌ ${chalk.bold("Cancelar tudo")} (para o push)`),
+    );
 
-      if (!["s", "yes", "y"].includes(answer.toLowerCase().trim())) {
+    const choice = await askConfirmation(
+      chalk.yellowBright.bold("\nEscolha uma opção (1-3 ou 0): "),
+    );
+
+    switch (choice.trim()) {
+      case "1":
+        console.log(chalk.blueBright("\n📤 Publicando no LinkedIn..."));
+        await publishPost(postText, config);
         console.log(
-          chalk.gray("✅ Push continuará, mas a publicação foi cancelada."),
+          chalk.green.bold("🎉 Post publicado! Prosseguindo com o push...\n"),
         );
-        return;
-      }
-    }
+        process.exit(0); // Sucesso para o Git: Push continua
+        break;
 
-    console.log(chalk.blueBright("📤 Publicando no LinkedIn..."));
-    await publishPost(postText, config);
-    console.log(chalk.green.bold("\n🎉 Post publicado com sucesso!\n"));
+      case "2":
+        console.log(chalk.blueBright("\n📤 Publicando apenas no LinkedIn..."));
+        await publishPost(postText, config);
+        console.log(chalk.green.bold("🎉 Post publicado com sucesso!"));
+        console.log(
+          chalk.yellow("⚠️  Push cancelado conforme solicitado (Opção 2)."),
+        );
+        process.exit(1); // "Erro" para o Git: Push cancelado
+        break;
+
+      case "3":
+        console.log(
+          chalk.gray(
+            "\n✅ Pulando publicação. Prosseguindo apenas com o push...",
+          ),
+        );
+        process.exit(0); // Sucesso para o Git: Push continua
+        break;
+
+      case "0":
+        console.log(
+          chalk.red("\n❌ Operação cancelada. O push não será realizado."),
+        );
+        process.exit(1); // "Erro" para o Git: Push cancelado
+        break;
+
+      default:
+        console.log(
+          chalk.red("\n🚫 Opção inválida. Operação abortada por segurança."),
+        );
+        process.exit(1);
+    }
   } catch (err) {
     console.error(
       chalk.red.bold("\n❌ Erro no processo:"),
