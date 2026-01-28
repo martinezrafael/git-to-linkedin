@@ -1,5 +1,5 @@
 {
-  "name": "git-to-linkedin",
+  "name": "@martinezrafael/git-to-linkedin",
   "version": "0.1.0",
   "description": "Gere posts técnicos automaticamente a partir de git diff e publique no LinkedIn",
   "type": "module",

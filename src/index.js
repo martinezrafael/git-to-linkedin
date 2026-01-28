@@ -1,9 +1,9 @@
-import getLatestImageFromFolder from "./getLatestImageFromFolder.js";
-import generatePostFromDiff from "./generatePostFromDiff.js";
-import getPersonUrn from "./getPersonUrn.js";
-import uploadImage from "./uploadImage.js";
-import createPostWithImage from "./createPostWithImage.js";
-import createTextOnlyPost from "./createTextOnlyPost.js";
+import getLatestImageFromFolder from "./utils/getLatestImageFromFolder.js";
+import generatePostFromDiff from "./ai/generatePostFromDiff.js";
+import getPersonUrn from "./linkedin/getPersonUrn.js";
+import uploadImage from "./utils/uploadImage.js";
+import createPostWithImage from "./linkedin/createPostWithImage.js";
+import createTextOnlyPost from "./linkedin/createTextOnlyPost.js";
 
 const DEFAULT_LINKEDIN_API = "https://api.linkedin.com/v2";
 

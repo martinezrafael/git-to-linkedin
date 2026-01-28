@@ -3,6 +3,7 @@ import { execSync } from "child_process";
 import "dotenv/config";
 import loadPromptConfig from "./loadPromptConfig.js";
 import askConfirmation from "./askConfirmation.js";
+import getLatestImageFromFolder from "./utils/getLatestImageFromFolder.js";
 import { generateText, publishPost } from "./index.js";
 
 const ROOT_DIR = process.cwd();
@@ -35,6 +36,13 @@ async function run() {
 
     console.log("\n--- PRÉ-VISUALIZAÇÃO ---\n");
     console.log(postText);
+
+    try {
+      const latestImagePath = getLatestImageFromFolder(IMAGES_DIR);
+      console.log(`\n--- IMAGEM PRÉ-VISUALIZAÇÃO ---\n${latestImagePath}`);
+    } catch (imageError) {
+      console.warn(`Não foi possível pré-visualizar a imagem: ${imageError.message}`);
+    }
 
     if (config.dryRun) {
       console.log(

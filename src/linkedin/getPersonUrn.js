@@ -1,5 +1,5 @@
 import axios from "axios";
-import retry from "./retry.js";
+import retry from "../utils/retry.js";
 
 /**
  * @param {string} accessToken
